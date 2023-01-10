@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IFrame Test</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <style>
+            body {
+                background-color: white;
+            }
+        </style>
+
+    </head>
+    <body style="margin: 0; padding: 0">
+        <iframe id="iframe" width="100%" height="100%" style="border: none"></iframe>
+
+        <script type="text/javascript" src="$WEBAPIS/webapis/webapis.js"></script>
+        <script type="text/javascript" src="$B2BAPIS/b2bapis/b2bapis.js"></script>
+
+        <script>
+            var urlLauncherAddress = window.b2bapis.b2bcontrol.getURLLauncherAddress();
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", urlLauncherAddress + "/config.json");
+            xhr.timeout = 8000;
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    try {
+                        let remoteConfig = JSON.parse(xhr.responseText);
+                        document.getElementById("iframe").src = remoteConfig.url;
+                    } catch (e) {
+                        console.log(e);
+                        console.error("config.json does not contain valid json");
+                    }
+                    return;
+                }
+                console.error("config.json request failed", xhr.status);
+            };
+
+            xhr.onerror = function (e) {
+                console.error(e);
+            };
+
+            xhr.ontimeout = function () {
+           		console.error("request timeout");
+            };
+
+            xhr.send();
+        </script>
+    </body>
+</html>
