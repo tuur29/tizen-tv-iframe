@@ -9,8 +9,11 @@
             body {
                 background-color: white;
             }
-        </style>
 
+            a {
+                margin: 20px;
+            }
+        </style>
     </head>
     <body style="margin: 0; padding: 0">
         <iframe id="iframe" width="100%" height="100%" style="border: none"></iframe>
@@ -27,8 +30,22 @@
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     try {
-                        let remoteConfig = JSON.parse(xhr.responseText);
-                        document.getElementById("iframe").src = remoteConfig.url;
+                        var remoteConfig = JSON.parse(xhr.responseText);
+                        var iframe = document.getElementById("iframe");
+
+                        if (remoteConfig.redirect) {
+                            document.body.removeChild(iframe);
+
+                            var link = document.createElement("a");
+                            link.href = remoteConfig.url;
+                            link.innerHTML = remoteConfig.url;
+                            document.body.appendChild(link);
+
+                            // doesnt always work, so just rendering the link above just in case
+                            window.location.href = remoteConfig.url;
+                        } else {
+                            iframe.src = remoteConfig.url;
+                        }
                     } catch (e) {
                         console.log(e);
                         console.error("config.json does not contain valid json");
@@ -43,7 +60,7 @@
             };
 
             xhr.ontimeout = function () {
-           		console.error("request timeout");
+                console.error("request timeout");
             };
 
             xhr.send();
