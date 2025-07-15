@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="robots" content="noindex" />
+        <title>Iframe</title>
+
+        <Style>
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+
+            iframe {
+                width: 100vw;
+                height: 100vh;
+                border: 0;
+            }
+        </Style>
+    </head>
+
+    <body>
+        <iframe id="iframe"></iframe>
+        <script>
+            function onError(error) {
+                const message = document.createElement("p");
+                message.innerHTML = error + ": " + error.message;
+                message.style.color = "red";
+                document.body.prepend(message);
+            }
+
+            try {
+                fetch("./config.json")
+                    .catch(onError)
+                    .then((response) => response.json())
+                    .catch(onError)
+                    .then((data) => {
+                        if (data.redirect) {
+                            const link = document.createElement("a");
+                            link.href = data.url;
+                            link.innerHTML = data.url;
+                            document.body.prepend(link);
+                            // doesnt always work on tizen 4, so just rendering a link above in case this doesnt work
+                            window.location.href = data.url;
+                        } else {
+                            document.querySelector("#iframe").src = data.url;
+                        }
+                    });
+            } catch (error) {
+                onError(error);
+            }
+        </script>
+    </body>
+</html>
